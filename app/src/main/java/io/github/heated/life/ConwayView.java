@@ -11,7 +11,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
-    int cellSize = 30;
+    int cellSize = (int) (15 * getResources().getDisplayMetrics().density);
     boolean firstDraw = true;
     ConwayActivityThread thread;
     SurfaceHolder holder;
@@ -82,8 +82,8 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
         Paint cell = new Paint();
         cell.setColor(Color.WHITE);
 
-        for (int x = 0; x < conway.gridWidth; x++) {
-            for (int y = 0; y < conway.gridHeight; y++) {
+        for (int x = 0; x < conway.width; x++) {
+            for (int y = 0; y < conway.height; y++) {
                 drawCell(canvas, x, y, cell);
             }
         }
@@ -93,7 +93,7 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
         int x = cellX * cellSize;
         int y = cellY * cellSize;
 
-        if (conway.grid[cellX][cellY]) {
+        if (conway.cell(cellX, cellY)) {
             canvas.drawRect(x, y, x + cellSize, y + cellSize, cell);
         }
     }
@@ -104,7 +104,7 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
             initGrid();
         }
 
-        alrightyWereGood();
+        unpause();
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        waitATick();
+        pause();
     }
 
     public void startThread() {
@@ -123,6 +123,10 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void stopThread() {
+        if (thread == null) {
+            return;
+        }
+
         boolean retry = true;
         while (retry) {
             try {
@@ -135,14 +139,14 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public void waitATick() {
-        brb = thread.running;
+    public void pause() {
+        brb = thread != null && thread.running;
         if (brb) {
             stopThread();
         }
     }
 
-    public void alrightyWereGood() {
+    public void unpause() {
         if (brb) {
             brb = false;
             startThread();
@@ -180,13 +184,13 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
         int cellX = (int) (x / cellSize);
         int cellY = (int) (y / cellSize);
 
-        waitATick();
+        pause();
 
-        boolean cellAlive = conway.grid[cellX][cellY];
+        boolean cellAlive = conway.cell(cellX, cellY);
         drawLiving = !cellAlive;
         drawPoint(x, y);
 
-        alrightyWereGood();
+        unpause();
 
     }
 
@@ -197,7 +201,7 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
             double distance = Math.sqrt(dx * dx + dy * dy);
 
             if (distance >= 1) {
-                waitATick();
+                pause();
 
                 for (int i = 1; i <= distance; i++) {
                     double newX = mPreviousX + i * dx / distance;
@@ -208,7 +212,7 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
                 mPreviousX = x;
                 mPreviousY = y;
 
-                alrightyWereGood();
+                unpause();
             }
         }
     }

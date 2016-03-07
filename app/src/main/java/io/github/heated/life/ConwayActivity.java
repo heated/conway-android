@@ -1,14 +1,12 @@
 package io.github.heated.life;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
-public class ConwayActivity extends AppCompatActivity {
+public class ConwayActivity extends Activity {
     ConwayView conwayView;
 
     @Override
@@ -39,52 +37,34 @@ public class ConwayActivity extends AppCompatActivity {
         ToggleButton toggle = (ToggleButton) findViewById(R.id.torus);
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                conwayView.waitATick();
+                conwayView.pause();
                 conwayView.conway.toggleTorus();
-                conwayView.alrightyWereGood();
+                conwayView.unpause();
             }
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_conway, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        return id == R.id.action_settings || super.onOptionsItemSelected(item);
-    }
-
-    public void randomizeGrid(View view) {
-        conwayView.waitATick();
-        conwayView.conway.randomizeGrid();
-        conwayView.alrightyWereGood();
+    public void randomizeCells(View view) {
+        conwayView.pause();
+        conwayView.conway.randomizeCells();
+        conwayView.unpause();
     }
 
     public void clearGrid(View view) {
-        conwayView.waitATick();
+        conwayView.pause();
         conwayView.conway.clearGrid();
-        conwayView.alrightyWereGood();
+        conwayView.unpause();
     }
 
     public void setGridToGlider(View view) {
-        conwayView.waitATick();
+        conwayView.pause();
         conwayView.conway.setGridToGlider();
-        conwayView.alrightyWereGood();
+        conwayView.unpause();
     }
 
     public void step(View view) {
-        conwayView.waitATick();
+        conwayView.pause();
         conwayView.conway.nextGeneration();
-        conwayView.alrightyWereGood();
+        conwayView.unpause();
     }
 }

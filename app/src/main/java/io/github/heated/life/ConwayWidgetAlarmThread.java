@@ -22,9 +22,9 @@ public class ConwayWidgetAlarmThread extends BroadcastReceiver {
 
         update(context, intent, remoteViews);
 
-        ComponentName thiswidget = new ComponentName(context, ConwayWidgetProvider.class);
+        ComponentName thisWidget = new ComponentName(context, ConwayWidgetProvider.class);
         AppWidgetManager manager = AppWidgetManager.getInstance(context);
-        manager.updateAppWidget(thiswidget, remoteViews);
+        manager.updateAppWidget(thisWidget, remoteViews);
 
         wl.release();
     }
@@ -32,21 +32,15 @@ public class ConwayWidgetAlarmThread extends BroadcastReceiver {
     public void update(Context context, Intent intent, RemoteViews remoteViews) {
         int width = intent.getIntExtra("width", 10);
         int height = intent.getIntExtra("height", 10);
-        boolean[] grid = intent.getBooleanArrayExtra("grid");
+        boolean[] cells = intent.getBooleanArrayExtra("cells");
 
-        Conway conway = new Conway(width, height, grid);
+        Conway conway = new Conway(width, height, cells);
         conway.nextGeneration();
-
-        ConwayWidgetView view = new ConwayWidgetView(context, conway);
-        int size = view.cellSize;
-
-        Bitmap bitmap = Bitmap.createBitmap(width * size, height * size, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
+        Bitmap bitmap = ConwayWidgetView.ToBitmap(context, conway);
 
         remoteViews.setImageViewBitmap(R.id.imageView, bitmap);
 
-        intent.putExtra("grid", conway.serializeGrid());
+        intent.putExtra("cells", conway.cells);
         PendingIntent.getBroadcast(context, 1337, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }

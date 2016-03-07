@@ -3,4 +3,8 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="clear_button_text">clear</string>
+    <string name="step_button_text">step</string>
+    <string name="glider_button_text">glider</string>
+    <string name="randomize_button_text">randomize</string>
 </resources>

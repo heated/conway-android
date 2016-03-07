@@ -1,32 +1,48 @@
 package io.github.heated.life;
 
 public class Conway {
-    public int gridWidth;
-    public int gridHeight;
-    public boolean[][] grid;
+    public int width, height, totalGridSize;
+    public boolean[] cells;
     public boolean torus = false;
 
     public Conway(int width, int height) {
-        gridWidth = width;
-        gridHeight = height;
-        grid = new boolean[gridWidth][gridHeight];
+        this.width = width;
+        this.height = height;
+        totalGridSize = this.width * this.height;
+        clearGrid();
     }
 
-    public Conway(int width, int height, boolean[] serializedGrid) {
+    public Conway(int width, int height, boolean[] cells) {
         this(width, height);
-        deSerializeGrid(serializedGrid);
+        this.cells = cells;
+    }
+
+    int pos(int x, int y) {
+        return x * height + y;
+    }
+
+    boolean cell(int x, int y) {
+        return cells[pos(x, y)];
+    }
+
+    void setCell(int x, int y, boolean alive) {
+        cells[pos(x, y)] = alive;
+    }
+
+    void setCell(int x, int y) {
+        setCell(x, y, true);
     }
 
     public void nextGeneration() {
-        boolean[][] newGrid = new boolean[gridWidth][gridHeight];
+        boolean[] newGrid = blankGrid();
 
-        for (int x = 0; x < gridWidth; x++) {
-            for (int y = 0; y < gridHeight; y++) {
-                newGrid[x][y] = cellLives(x, y);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                newGrid[pos(x, y)] = cellLives(x, y);
             }
         }
 
-        grid = newGrid;
+        cells = newGrid;
     }
 
     int getNeighbors(int cellX, int cellY) {
@@ -38,14 +54,11 @@ public class Conway {
                 int y = cellY + dy;
 
                 if (torus) {
-                    x = (x + gridWidth) % gridWidth;
-                    y = (y + gridHeight) % gridHeight;
+                    x = (x + width) % width;
+                    y = (y + height) % height;
                 }
 
-                if ((dx != 0 || dy != 0) &&
-                        validPos(x, y)       &&
-                        grid[x][y]) {
-
+                if (isLivingNeighbor(cellX, cellY, x, y)) {
                     neighbors++;
                 }
             }
@@ -54,10 +67,16 @@ public class Conway {
         return neighbors;
     }
 
+    boolean isLivingNeighbor(int x1, int y1, int x2, int y2) {
+        return (x1 != x2 || y1 != y2) &&
+                validPos(x2, y2)      &&
+                cell(x2, y2);
+    }
+
     boolean cellLives(int x, int y) {
         int neighbors = getNeighbors(x, y);
 
-        return neighbors == 3 || (neighbors == 2 && grid[x][y]);
+        return neighbors == 3 || (neighbors == 2 && cell(x, y));
     }
 
     boolean inRange(int a, int left, int right) {
@@ -65,57 +84,36 @@ public class Conway {
     }
 
     boolean validPos(int x, int y) {
-        return  inRange(x, 0, gridWidth) &&
-                inRange(y, 0, gridHeight);
+        return  inRange(x, 0, width) &&
+                inRange(y, 0, height);
     }
 
-    public void randomizeGrid() {
-        for (int x = 0; x < gridWidth; x++) {
-            for (int y = 0; y < gridHeight; y++) {
-                grid[x][y] = Math.random() > .5;
-            }
+    public void randomizeCells() {
+        for (int i = 0; i < cells.length; i++) {
+            cells[i] = Math.random() > .5;
         }
     }
 
     public void clearGrid() {
-        for (int x = 0; x < gridWidth; x++) {
-            for (int y = 0; y < gridHeight; y++) {
-                grid[x][y] = false;
-            }
-        }
+        cells = blankGrid();
+    }
+
+    public boolean[] blankGrid() {
+        return new boolean[totalGridSize];
     }
 
     public void setGridToGlider() {
         clearGrid();
-        grid[1][0] = true;
-        grid[2][1] = true;
-        grid[0][2] = true;
-        grid[1][2] = true;
-        grid[2][2] = true;
-    }
-
-    public boolean[] serializeGrid() {
-        boolean[] result = new boolean[gridWidth * gridHeight];
-        for (int x = 0; x < gridWidth; x++) {
-            for (int y = 0; y < gridHeight; y++) {
-                result[x * gridHeight + y] = grid[x][y];
-            }
-        }
-
-        return result;
-    }
-
-    public void deSerializeGrid(boolean[] serializedGrid) {
-        for (int x = 0; x < gridWidth; x++) {
-            for (int y = 0; y < gridHeight; y++) {
-                grid[x][y] = serializedGrid[x * gridHeight + y];
-            }
-        }
+        setCell(1, 0);
+        setCell(2, 1);
+        setCell(0, 2);
+        setCell(1, 2);
+        setCell(2, 2);
     }
 
     public static Conway Random(int width, int height) {
         Conway conway = new Conway(width, height);
-        conway.randomizeGrid();
+        conway.randomizeCells();
         return conway;
     }
 
@@ -125,7 +123,7 @@ public class Conway {
 
     public void tryToSet(int x, int y, boolean alive) {
         if (validPos(x, y)) {
-            grid[x][y] = alive;
+            setCell(x, y, alive);
         }
     }
 }

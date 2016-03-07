@@ -8,7 +8,6 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.RemoteViews;
@@ -20,7 +19,7 @@ public class ConwayWidgetProvider extends AppWidgetProvider {
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, ConwayWidgetAlarmThread.class);
-        PendingIntent sender = PendingIntent.getBroadcast(context, 1337, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent sender = getBroadcast(context, intent, true);
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.conway_widget);
         newGame(context, remoteViews, 10, 10);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000, sender);
@@ -28,28 +27,21 @@ public class ConwayWidgetProvider extends AppWidgetProvider {
 
     public void newGame(Context context, RemoteViews remoteViews, int width, int height) {
         Conway conway = Conway.Random(width, height);
-
-        ConwayWidgetView view = new ConwayWidgetView(context, conway);
-
-        Bitmap bitmap = Bitmap.createBitmap(width  * view.cellSize,
-                height * view.cellSize,
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
+        Bitmap bitmap = ConwayWidgetView.ToBitmap(context, conway);
         remoteViews.setImageViewBitmap(R.id.imageView, bitmap);
 
         Intent intent = new Intent(context, ConwayWidgetAlarmThread.class);
         intent.putExtra("width", width);
         intent.putExtra("height", height);
-        intent.putExtra("grid", conway.serializeGrid());
+        intent.putExtra("cells", conway.cells);
 
-        PendingIntent.getBroadcast(context, 1337, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        getBroadcast(context, intent, true);
     }
 
     @Override
     public void onDisabled(Context context) {
         Intent intent = new Intent(context, ConwayWidgetAlarmThread.class);
-        PendingIntent sender = PendingIntent.getBroadcast(context, 1337, intent, 0);
+        PendingIntent sender = getBroadcast(context, intent, false);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(sender);
@@ -71,8 +63,7 @@ public class ConwayWidgetProvider extends AppWidgetProvider {
             intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
 
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
-                    0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = getBroadcast(context, intent, true);
             remoteViews.setOnClickPendingIntent(R.id.imageView, pendingIntent);
 
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -91,8 +82,15 @@ public class ConwayWidgetProvider extends AppWidgetProvider {
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.conway_widget);
             int minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
             int maxHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT);
-            newGame(context, remoteViews, minWidth / 5, maxHeight / 5);
+            int cellSize = ConwayWidgetView.CellSize;
+            newGame(context, remoteViews,
+                    minWidth  / cellSize,
+                    maxHeight / cellSize);
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
         }
+    }
+
+    PendingIntent getBroadcast(Context context, Intent intent, boolean updateCurrent) {
+        return PendingIntent.getBroadcast(context, 1337, intent, updateCurrent ? PendingIntent.FLAG_UPDATE_CURRENT : 0);
     }
 }
