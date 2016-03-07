@@ -1,0 +1,87 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ConwayActivity"
+    android:orientation="vertical">
+
+    <io.github.heated.life.ConwayView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/grid"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="20dp"/>
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/playStop"
+        android:layout_below="@+id/grid"
+        android:layout_marginLeft="20dp"
+        android:checked="true"
+        android:textOff="start"
+        android:textOn="stop"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="15dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="clear"
+        android:id="@+id/clear"
+        android:onClick="clearGrid"
+        android:layout_alignTop="@+id/step"
+        android:layout_toRightOf="@+id/playStop"
+        android:layout_toEndOf="@+id/playStop"
+        android:layout_marginBottom="10dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="step"
+        android:id="@+id/step"
+        android:onClick="step"
+        android:layout_below="@+id/playStop"
+        android:layout_alignLeft="@+id/playStop"
+        android:layout_alignStart="@+id/playStop"
+        android:layout_marginBottom="10dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="glider"
+        android:id="@+id/glider"
+        android:onClick="setGridToGlider"
+        android:layout_below="@+id/step"
+        android:layout_alignLeft="@+id/step"
+        android:layout_alignStart="@+id/step" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="randomize"
+        android:id="@+id/randomize"
+        android:onClick="randomizeGrid"
+        android:layout_alignTop="@+id/glider"
+        android:layout_alignLeft="@+id/clear"
+        android:layout_alignStart="@+id/clear" />
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/torus"
+        android:checked="false"
+        android:textOff="torus"
+        android:layout_below="@+id/grid"
+        android:layout_alignLeft="@+id/clear"
+        android:layout_alignStart="@+id/clear"
+        android:textOn="rectangle"
+        android:layout_marginBottom="10dp" />
+
+</RelativeLayout>
