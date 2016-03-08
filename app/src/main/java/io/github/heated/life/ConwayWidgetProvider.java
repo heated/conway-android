@@ -22,7 +22,7 @@ public class ConwayWidgetProvider extends AppWidgetProvider {
         PendingIntent sender = getBroadcast(context, intent, true);
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.conway_widget);
         newGame(context, remoteViews, 10, 10);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000, sender);
+        alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 1000, sender);
     }
 
     public void newGame(Context context, RemoteViews remoteViews, int width, int height) {
@@ -91,6 +91,6 @@ public class ConwayWidgetProvider extends AppWidgetProvider {
     }
 
     PendingIntent getBroadcast(Context context, Intent intent, boolean updateCurrent) {
-        return PendingIntent.getBroadcast(context, 1337, intent, updateCurrent ? PendingIntent.FLAG_UPDATE_CURRENT : 0);
+        return PendingIntent.getBroadcast(context, 1337, intent, updateCurrent ? PendingIntent.FLAG_UPDATE_CURRENT : PendingIntent.FLAG_CANCEL_CURRENT);
     }
 }
