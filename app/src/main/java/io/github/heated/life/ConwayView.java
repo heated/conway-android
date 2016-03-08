@@ -14,7 +14,8 @@ import android.widget.TextView;
 public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
     int cellSize = (int) (15 * getResources().getDisplayMetrics().density);
     boolean firstDraw = true;
-    ConwayActivityUIThread thread;
+    ConwayActivityUIThread uiThread;
+    ConwayActivityWorkerThread workerThread;
     SurfaceHolder holder;
     boolean brb = true;
     Conway conway;
@@ -54,12 +55,14 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
         int gridWidth = getWidth() / cellSize;
         int gridHeight = getHeight() / cellSize;
         conway = Conway.Random(gridWidth, gridHeight);
+        System.out.println(conway);
     }
 
     void drawTo(Canvas canvas) {
         if (firstDraw) {
             firstDraw = false;
             initGrid();
+            workerThread.setConway(conway);
         }
 
         drawBackground(canvas);
@@ -126,21 +129,27 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void startThread() {
-        thread = new ConwayActivityUIThread(this, frameRate);
-        thread.setRunning(true);
-        thread.start();
+        uiThread = new ConwayActivityUIThread(this, frameRate);
+        uiThread.setRunning(true);
+        uiThread.start();
+        workerThread = new ConwayActivityWorkerThread(conway, frameRate);
+        workerThread.setRunning(true);
+        workerThread.start();
     }
 
     public void stopThread() {
-        if (thread == null) {
+        if (uiThread == null) {
             return;
         }
+
+        uiThread.setRunning(false);
+        workerThread.setRunning(false);
 
         boolean retry = true;
         while (retry) {
             try {
-                thread.setRunning(false);
-                thread.join();
+                uiThread.join();
+                workerThread.join();
                 retry = false;
             } catch (InterruptedException e) {
 
@@ -149,7 +158,7 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void pause() {
-        brb = thread != null && thread.running;
+        brb = uiThread != null && uiThread.running;
         if (brb) {
             stopThread();
         }
@@ -243,8 +252,9 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
             stopThread();
         }
 
-        if (thread != null) {
-            thread.setFPS(frameRate);
+        if (uiThread != null) {
+            uiThread.setFPS(frameRate);
+            workerThread.setFPS(frameRate);
         }
     }
 
