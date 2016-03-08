@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 public class ConwayActivity extends Activity {
@@ -16,21 +18,46 @@ public class ConwayActivity extends Activity {
 
         conwayView = (ConwayView) findViewById(R.id.grid);
 
-        addPlayStopListener();
+//        addPlayStopListener();
+        addFramerateListener();
         addTorusListener();
     }
 
-    void addPlayStopListener() {
-        ToggleButton toggle = (ToggleButton) findViewById(R.id.playStop);
-        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    conwayView.startThread();
-                } else {
-                    conwayView.stopThread();
-                }
+    void addFramerateListener() {
+        SeekBar bar = (SeekBar) findViewById(R.id.frameRate);
+
+        bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                handleFramerate(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
+    }
+
+    void handleFramerate(int option) {
+        int[] options = { 0, 1, 2, 5, 10, 20, 1001 };
+        int frameRate = options[option];
+        setFramerate(frameRate);
+    }
+
+    public void setFramerate(int frameRate) {
+        TextView fps = (TextView) findViewById(R.id.frameRateText);
+        if (frameRate == 1001) {
+            fps.setText("ÜBER");
+        } else {
+            fps.setText(frameRate + " FPS");
+        }
+        conwayView.setFramerate(frameRate);
     }
 
     void addTorusListener() {

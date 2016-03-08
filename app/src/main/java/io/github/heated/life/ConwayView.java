@@ -21,6 +21,7 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
     private float mPreviousX;
     private float mPreviousY;
     private boolean drawLiving;
+    private int frameRate = 1;
 
     public ConwayView(Context context) {
         super(context);
@@ -117,7 +118,7 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void startThread() {
-        thread = new ConwayActivityThread(this);
+        thread = new ConwayActivityThread(this, frameRate);
         thread.setRunning(true);
         thread.start();
     }
@@ -150,9 +151,8 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
         if (brb) {
             brb = false;
             startThread();
-        } else {
-            render();
         }
+        render();
     }
 
     @Override
@@ -170,7 +170,7 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
                 break;
 
             case MotionEvent.ACTION_UP:
-                finishDrawing(x, y);
+                drawing = false;
                 break;
         }
 
@@ -223,7 +223,20 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
         conway.tryToSet(cellX, cellY, drawLiving);
     }
 
-    private void finishDrawing(float x, float y) {
-        drawing = false;
+    public void setFramerate(int frameRate) {
+        int prevFrameRate = this.frameRate;
+        this.frameRate = frameRate;
+
+        if (prevFrameRate == 0) {
+            startThread();
+        }
+
+        if (frameRate == 0) {
+            stopThread();
+        }
+
+        if (thread != null) {
+            thread.setFPS(frameRate);
+        }
     }
 }
