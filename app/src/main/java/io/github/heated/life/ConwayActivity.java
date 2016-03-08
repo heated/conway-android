@@ -17,8 +17,8 @@ public class ConwayActivity extends Activity {
         setContentView(R.layout.conway_activity);
 
         conwayView = (ConwayView) findViewById(R.id.grid);
+        conwayView.setGenerationText((TextView) findViewById(R.id.generationCount));
 
-//        addPlayStopListener();
         addFramerateListener();
         addTorusListener();
     }

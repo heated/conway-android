@@ -4,6 +4,7 @@ public class Conway {
     public int width, height, totalGridSize;
     public boolean[] cells;
     public boolean torus = false;
+    public int generations;
 
     public Conway(int width, int height) {
         this.width = width;
@@ -43,6 +44,7 @@ public class Conway {
         }
 
         cells = newGrid;
+        generations++;
     }
 
     int getNeighbors(int cellX, int cellY) {
@@ -92,10 +94,13 @@ public class Conway {
         for (int i = 0; i < cells.length; i++) {
             cells[i] = Math.random() > .5;
         }
+
+        generations = 0;
     }
 
     public void clearGrid() {
         cells = blankGrid();
+        generations = 0;
     }
 
     public boolean[] blankGrid() {

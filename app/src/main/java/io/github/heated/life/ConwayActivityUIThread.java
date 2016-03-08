@@ -1,12 +1,12 @@
 package io.github.heated.life;
 
-public class ConwayActivityThread extends Thread {
+public class ConwayActivityUIThread extends Thread {
     public boolean running = true;
     ConwayView conwayView;
     int sleepTicks;
     long startTime, waitUntil;
 
-    public ConwayActivityThread(ConwayView conwayView, int fps) {
+    public ConwayActivityUIThread(ConwayView conwayView, int fps) {
         super();
         this.conwayView = conwayView;
         startTime = System.currentTimeMillis();
@@ -36,6 +36,12 @@ public class ConwayActivityThread extends Thread {
 
                 conwayView.conway.nextGeneration();
                 conwayView.render();
+
+//                try {
+//                    wait(System.currentTimeMillis() - waitUntil);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
     }

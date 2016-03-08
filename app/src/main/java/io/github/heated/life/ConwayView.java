@@ -9,19 +9,21 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.TextView;
 
 public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
     int cellSize = (int) (15 * getResources().getDisplayMetrics().density);
     boolean firstDraw = true;
-    ConwayActivityThread thread;
+    ConwayActivityUIThread thread;
     SurfaceHolder holder;
-    private boolean brb = true;
+    boolean brb = true;
     Conway conway;
-    private boolean drawing = false;
-    private float mPreviousX;
-    private float mPreviousY;
-    private boolean drawLiving;
-    private int frameRate = 1;
+    boolean drawing = false;
+    float mPreviousX;
+    float mPreviousY;
+    boolean drawLiving;
+    int frameRate = 1;
+    private TextView generationText;
 
     public ConwayView(Context context) {
         super(context);
@@ -70,6 +72,12 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
             drawTo(canvas);
             holder.unlockCanvasAndPost(canvas);
         }
+
+        generationText.post(new Runnable() {
+            public void run() {
+                generationText.setText(conway.generations + " Generations");
+            }
+        });
     }
 
     void drawBackground(Canvas canvas) {
@@ -118,7 +126,7 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void startThread() {
-        thread = new ConwayActivityThread(this, frameRate);
+        thread = new ConwayActivityUIThread(this, frameRate);
         thread.setRunning(true);
         thread.start();
     }
@@ -238,5 +246,9 @@ public class ConwayView extends SurfaceView implements SurfaceHolder.Callback {
         if (thread != null) {
             thread.setFPS(frameRate);
         }
+    }
+
+    public void setGenerationText(TextView generationText) {
+        this.generationText = generationText;
     }
 }
